@@ -341,7 +341,7 @@ private[spark] object Utils extends Logging {
    * Get the local host's IP address in dotted-quad format (e.g. 1.2.3.4).
    * Note, this is typically not used from within core spark.
    */
-  lazy val (localIpAddress: String, localIpAddressHostname:String) = getLocalIpAddressAndHostName()
+  lazy val (localIpAddress, localIpAddressHostname:String) = getLocalIpAddressAndHostName()
 
   private def getLocalIpAddressAndHostName(): (String, String) = {
     val defaultIpOverride = System.getenv("SPARK_LOCAL_IP")
