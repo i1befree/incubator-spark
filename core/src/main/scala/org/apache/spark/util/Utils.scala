@@ -341,13 +341,12 @@ private[spark] object Utils extends Logging {
    * Get the local host's IP address in dotted-quad format (e.g. 1.2.3.4).
    * Note, this is typically not used from within core spark.
    */
-  lazy val localIpAddress: String = findLocalIpAddress()
-  lazy val localIpAddressHostname: String = getAddressHostName(localIpAddress)
+  lazy val (localIpAddress: String, localIpAddressHostname:String) = getLocalIpAddressAndHostName()
 
-  private def findLocalIpAddress(): String = {
+  private def getLocalIpAddressAndHostName(): (String, String) = {
     val defaultIpOverride = System.getenv("SPARK_LOCAL_IP")
     if (defaultIpOverride != null) {
-      defaultIpOverride
+      (defaultIpOverride, getAddressHostName(defaultIpOverride))
     } else {
       val address = InetAddress.getLocalHost
       if (address.isLoopbackAddress) {
@@ -361,7 +360,7 @@ private[spark] object Utils extends Logging {
               " a loopback address: " + address.getHostAddress + "; using " + addr.getHostAddress +
               " instead (on interface " + ni.getName + ")")
             logWarning("Set SPARK_LOCAL_IP if you need to bind to another address")
-            return addr.getHostAddress
+            return (addr.getHostAddress, getAddressHostName(addr.getHostAddress))
           }
         }
         logWarning("Your hostname, " + InetAddress.getLocalHost.getHostName + " resolves to" +
@@ -369,7 +368,8 @@ private[spark] object Utils extends Logging {
           " external IP address!")
         logWarning("Set SPARK_LOCAL_IP if you need to bind to another address")
       }
-      address.getHostAddress
+
+      (address.getHostAddress, address.getHostName)
     }
   }
 

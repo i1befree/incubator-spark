@@ -24,6 +24,7 @@ import java.nio.{ByteBuffer, ByteOrder}
 import org.scalatest.FunSuite
 import org.apache.commons.io.FileUtils
 import scala.util.Random
+import org.scalatest.PrivateMethodTester._
 
 class UtilsSuite extends FunSuite {
 
@@ -145,6 +146,16 @@ class UtilsSuite extends FunSuite {
     bbuf.putLong(testval)
     assert(bbuf.array.length === 8)
     assert(Utils.deserializeLongValue(bbuf.array) === testval)
+  }
+
+  test("local ip test"){
+    val getLocalIpAddressAndHostName = PrivateMethod[(String, String)]('getLocalIpAddressAndHostName)
+
+    //SPARK_LOCAL_IP is not set
+    if(System.getenv("SPARK_LOCAL_IP") == null){
+      val (hostName, hostAddress:String) = Utils invokePrivate getLocalIpAddressAndHostName()
+      assert(hostName != hostAddress)
+    }
   }
 }
 
